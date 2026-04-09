@@ -221,7 +221,7 @@ function togAll(){if(chk.size>=fl.length)setChk(new Set());else{var n=new Set();
 function handleDel(){if(!cfm){setCfm(true);return;}onBulkDel(Array.from(chk));setChk(new Set());setCfm(false);}
 useEffect(function(){setCfm(false);},[chk.size]);
 var cp='5px 3px';
-var cols=[{k:"buildName",l:"건명",w:"150px"},{k:"uploadDate",l:"기준일",w:"82px"},{k:"packDate",l:"최초포장일",w:"82px"},{k:"itemName",l:"품목명",w:"300px"},{k:"itemCode",l:"품목코드",w:"105px"},{k:"color",l:"색상",w:"55px"},{k:"factory",l:"생산처",w:"68px"},{k:"line",l:"공정/라인",w:"100px"},{k:"quantity",l:"수량",w:"50px"},{k:"photo",l:"사진",w:"50px"},{k:"done",l:"완료여부",w:"62px"},{k:"dl",l:"다운이력",w:"55px"}];
+var cols=[{k:"buildName",l:"건명",w:"150px"},{k:"uploadDate",l:"기준일",w:"82px"},{k:"packDate",l:"최초포장일",w:"82px"},{k:"itemName",l:"품목명",w:"1fr"},{k:"itemCode",l:"품목코드",w:"105px"},{k:"color",l:"색상",w:"55px"},{k:"factory",l:"생산처",w:"68px"},{k:"line",l:"공정/라인",w:"100px"},{k:"quantity",l:"수량",w:"50px"},{k:"photo",l:"사진",w:"50px"},{k:"done",l:"완료여부",w:"62px"},{k:"dl",l:"다운이력",w:"55px"}];
 var totalPg=Math.ceil(fl.length/20);var showPager=fl.length>20;var hasChk=chk.size>0;var allChk=chk.size>=fl.length&&fl.length>0;
 var gtc="30px "+cols.map(function(c){return c.w;}).join(" ");
 return(
@@ -249,8 +249,8 @@ return(
 <BW d onClick={handleDel} style={{fontSize:11,padding:"3px 10px"}}>{cfm?"⚠ 정말 삭제?":"🗑 삭제"}</BW>
 </div>:null}
 {fl.length===0?<div style={{textAlign:"center",padding:60,color:"#94a3b8",background:"#fff",borderRadius:12,border:BD,boxShadow:"0 1px 4px rgba(0,0,0,.05)"}}><div style={{fontSize:32,marginBottom:6}}>📦</div><div style={{fontSize:13}}>등록된 검사서가 없습니다</div></div>:
-<><div style={{background:"#fff",border:BD,borderRadius:8,overflow:"visible",boxShadow:"0 1px 6px rgba(0,0,0,.05)"}}>
-<div style={{display:"grid",gridTemplateColumns:gtc,borderBottom:"2px solid #1a56db",background:"#f8fafc",}}>
+<><div style={{background:"#fff",border:BD,borderRadius:8,overflow:"hidden",boxShadow:"0 1px 6px rgba(0,0,0,.05)"}}>
+<div style={{display:"grid",gridTemplateColumns:gtc,borderBottom:"2px solid #1a56db",background:"#f8fafc",minWidth:1200}}>
 <div style={{padding:"6px 3px",display:"flex",alignItems:"center",justifyContent:"center"}}><input type="checkbox" checked={allChk} onChange={togAll}/></div>
 {cols.map(function(c){var isA=sort&&sort.k===c.k;var ar=isA?(sort.d==="asc"?"▲":"▼"):"▽";var hf=!!fVal[c.k];
 return <div key={c.k} style={{padding:"6px 4px",fontSize:12,fontWeight:700,color:"#444",whiteSpace:"nowrap",display:"flex",alignItems:"center",justifyContent:c.k==="buildName"?"center":"flex-start",gap:1,cursor:"pointer",position:"relative",background:hf?"#fffbe6":"transparent"}} onClick={function(){togSort(c.k);}}>
@@ -260,12 +260,12 @@ return <div key={c.k} style={{padding:"6px 4px",fontSize:12,fontWeight:700,color
 </div>;})}
 </div>
 {(function(){var PZ=20,totPg2=totalPg||1,pg3=Math.min(curPg,totPg2),start=(pg3-1)*PZ,paged=fl.slice(start,start+PZ);return paged.map(function(x,idx){var done=isComplete(x);var filled=getFilledCount(x);var dl=(x.downloads||[]).length;var hasFill=filled>0;var hasDl=dl>0;var fillBg=done?"#dcfce7":hasFill?"#fff7ed":"#fee2e2";var fillColor=done?"#16a34a":hasFill?"#ea580c":"#dc2626";var dlColor=hasDl?"#1a56db":"#ccc";var dlText=hasDl?dl+"회":"-";
-return <div key={x.id} style={{display:"grid",gridTemplateColumns:gtc,borderBottom:BE,background:chk.has(x.id)?"#e8f0fe":idx%2===0?"#fff":"#fafafa",fontSize:13,alignItems:"center",}}>
+return <div key={x.id} style={{display:"grid",gridTemplateColumns:gtc,borderBottom:BE,background:chk.has(x.id)?"#e8f0fe":idx%2===0?"#fff":"#fafafa",fontSize:13,alignItems:"center",minWidth:1200}}>
 <div style={{padding:"6px 3px",textAlign:"center"}}><input type="checkbox" checked={chk.has(x.id)} onChange={function(){tog(x.id);}}/></div>
 <div style={{padding:"6px 4px",fontWeight:700,color:"#1a56db",cursor:"pointer",whiteSpace:"nowrap",textAlign:"center"}} onClick={function(){onSel(x.id);}}>{x.buildName||"-"}</div>
 <div style={{padding:"6px 4px",color:"#555"}}>{x.uploadDate||"-"}</div>
 <div style={{padding:"6px 4px",color:"#555"}}>{x.packDate||"-"}</div>
-<div style={{padding:"6px 4px",...ov,cursor:"pointer"}} onClick={function(){onSel(x.id);}}>{x.itemName||"-"}</div>
+<div style={{padding:"6px 4px",...ov,cursor:"pointer",maxWidth:350}} onClick={function(){onSel(x.id);}}>{x.itemName||"-"}</div>
 <div style={{padding:"6px 4px",color:"#666",fontFamily:"monospace",...ov}}>{x.itemCode||"-"}</div>
 <div style={{padding:"6px 4px",color:"#666",...ov}}>{x.color||"-"}</div>
 <div style={{padding:"6px 4px",color:"#666",...ov}}>{x.factory||"-"}</div>
