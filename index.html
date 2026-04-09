@@ -176,14 +176,14 @@ return(
 <div style={{fontWeight:700,fontSize:15,color:"#fff"}}>수출품 검사서 관리</div>
 <span style={{fontSize:11,color:"rgba(255,255,255,.6)",marginLeft:4}}>SIDIZ 품질관리팀</span></div>
 <div style={{display:"flex",gap:6}}>
-{pg!=="list"&&<BW onClick={function(){setPg("list");setSid(null);}}>← 목록</BW>}
-{pg==="list"&&<><BW onClick={function(){setPg("upload");}}>📋 업로드</BW><BW p onClick={function(){setPg("register");}}>+ 등록</BW></>}
+{pg!=="list"?<BW onClick={function(){setPg("list");setSid(null);}}>← 목록</BW>:null}
+{pg==="list"?<><BW onClick={function(){setPg("upload");}}>📋 업로드</BW><BW p onClick={function(){setPg("register");}}>+ 등록</BW></>:null}
 </div></div></div>
-{toast&&<div style={{position:"fixed",bottom:24,left:"50%",transform:"translateX(-50%)",padding:"10px 24px",borderRadius:20,background:"linear-gradient(135deg,#1e3a5f,#1a56db)",color:"#fff",fontSize:13,fontWeight:600,zIndex:999,boxShadow:"0 4px 16px rgba(26,86,219,.3)"}}>{toast}</div>}
-{pg==="list"&&<ListPg items={items} onSel={function(id){setSid(id);setPg("detail");}} onBulkDel={bulkDel} onBulkDl={bulkDl}/>}
-{pg==="upload"&&<UploadPg onAdd={addAll}/>}
-{pg==="register"&&<RegPg onOk={function(f){addAll([f]);}} onX={function(){setPg("list");}}/>}
-{pg==="detail"&&sid&&<DetPg item={items.find(function(x){return x.id===sid;})} onUpd={function(p){upd(sid,p);}} onDl={function(){bulkDl([sid]);}} onBack={function(){setPg("list");}}/>}
+{toast?<div style={{position:"fixed",bottom:24,left:"50%",transform:"translateX(-50%)",padding:"10px 24px",borderRadius:20,background:"linear-gradient(135deg,#1e3a5f,#1a56db)",color:"#fff",fontSize:13,fontWeight:600,zIndex:999,boxShadow:"0 4px 16px rgba(26,86,219,.3)"}}>{toast}</div>:null}
+{pg==="list"?<ListPg items={items} onSel={function(id){setSid(id);setPg("detail");}} onBulkDel={bulkDel} onBulkDl={bulkDl}/>:null}
+{pg==="upload"?<UploadPg onAdd={addAll}/>:null}
+{pg==="register"?<RegPg onOk={function(f){addAll([f]);}} onX={function(){setPg("list");}}/>:null}
+{(pg==="detail"&&sid)?<DetPg item={items.find(function(x){return x.id===sid;})} onUpd={function(p){upd(sid,p);}} onDl={function(){bulkDl([sid]);}} onBack={function(){setPg("list");}}/>:null}
 </div>);
 }
 var ov={overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'};
@@ -222,7 +222,7 @@ function handleDel(){if(!cfm){setCfm(true);return;}onBulkDel(Array.from(chk));se
 useEffect(function(){setCfm(false);},[chk.size]);
 var cp='5px 3px';
 var cols=[{k:"buildName",l:"건명",w:"150px"},{k:"uploadDate",l:"기준일",w:"86px"},{k:"packDate",l:"최초포장일",w:"86px"},{k:"itemName",l:"품목명",w:"1fr"},{k:"itemCode",l:"품목코드",w:"105px"},{k:"color",l:"색상",w:"55px"},{k:"factory",l:"생산처",w:"75px"},{k:"line",l:"공정/라인",w:"80px"},{k:"quantity",l:"수량",w:"46px"},{k:"photo",l:"사진",w:"55px"},{k:"done",l:"완료여부",w:"60px"},{k:"dl",l:"다운이력",w:"55px"}];
-var totalPg=Math.ceil(fl.length/20);var showPager=fl.length>20;var hasChk=chk.size>0;
+var totalPg=Math.ceil(fl.length/20);var showPager=fl.length>20;var hasChk=chk.size>0;var allChk=chk.size>=fl.length&&fl.length>0;
 var gtc="30px "+cols.map(function(c){return c.w;}).join(" ");
 return(
 <div style={{maxWidth:1400,margin:"0 auto",padding:"10px 16px"}}>
@@ -243,23 +243,23 @@ return(
 <div style={{display:"flex",alignItems:"center",gap:0,marginBottom:8}}>
 {[{k:"all",l:"전체"},{k:"done",l:"완료"},{k:"todo",l:"미등록"}].map(function(t){return <div key={t.k} onClick={function(){setTab(t.k);resetPg();}} style={{padding:"6px 16px",fontSize:12,fontWeight:tab===t.k?700:500,color:tab===t.k?"#fff":"#666",borderRadius:16,cursor:"pointer",background:tab===t.k?"#1a56db":"transparent"}}>{t.l}</div>;})}
 </div>
-{hasChk&&<div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6,padding:"5px 10px",background:"#e8f0fe",borderRadius:3,border:"1px solid #b6d4fe"}}>
+{hasChk?<div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6,padding:"5px 10px",background:"#e8f0fe",borderRadius:3,border:"1px solid #b6d4fe"}}>
 <span style={{fontSize:12,fontWeight:600,color:"#1a56db"}}>{chk.size}건 선택</span><div style={{flex:1}}/>
 <BW p onClick={function(){onBulkDl(Array.from(chk));setChk(new Set());}} style={{fontSize:11,padding:"3px 10px"}}>📥 다운로드</BW>
 <BW d onClick={handleDel} style={{fontSize:11,padding:"3px 10px"}}>{cfm?"⚠ 정말 삭제?":"🗑 삭제"}</BW>
-</div>}
+</div>:null}
 {fl.length===0?<div style={{textAlign:"center",padding:60,color:"#94a3b8",background:"#fff",borderRadius:12,border:BD,boxShadow:"0 1px 4px rgba(0,0,0,.05)"}}><div style={{fontSize:32,marginBottom:6}}>📦</div><div style={{fontSize:13}}>등록된 검사서가 없습니다</div></div>:
-<div style={{background:"#fff",border:BD,borderRadius:8,overflow:"visible",boxShadow:"0 1px 6px rgba(0,0,0,.05)"}}>
+<><div style={{background:"#fff",border:BD,borderRadius:8,overflow:"visible",boxShadow:"0 1px 6px rgba(0,0,0,.05)"}}>
 <div style={{display:"grid",gridTemplateColumns:gtc,borderBottom:"2px solid #1a56db",background:"#f8fafc"}}>
-<div style={{padding:"6px 3px",display:"flex",alignItems:"center",justifyContent:"center"}}><input type="checkbox" checked={chk.size>=fl.length&&fl.length>0} onChange={togAll}/></div>
+<div style={{padding:"6px 3px",display:"flex",alignItems:"center",justifyContent:"center"}}><input type="checkbox" checked={allChk} onChange={togAll}/></div>
 {cols.map(function(c){var isA=sort&&sort.k===c.k;var ar=isA?(sort.d==="asc"?"▲":"▼"):"▽";var hf=!!fVal[c.k];
 return <div key={c.k} style={{padding:"6px 4px",fontSize:12,fontWeight:700,color:"#444",whiteSpace:"nowrap",display:"flex",alignItems:"center",justifyContent:c.k==="buildName"?"center":"flex-start",gap:1,cursor:"pointer",position:"relative",background:hf?"#fffbe6":"transparent"}} onClick={function(){togSort(c.k);}}>
 <span>{c.l}</span><span style={{fontSize:8,color:isA?"#1a56db":"#ccc"}}>{ar}</span>
 <span style={{fontSize:8,color:hf?"#d97706":"#bbb",cursor:"pointer"}} onClick={function(e){e.stopPropagation();setFCol(fCol===c.k?null:c.k);}}>▼</span>
-{fCol===c.k&&<FilterDD vals={getUniq(c.k)} cur={fVal[c.k]} onPick={function(v){if(!v){var n=Object.assign({},fVal);delete n[c.k];setFVal(n);}else setFVal(Object.assign({},fVal,{[c.k]:v}));setFCol(null);}}/>}
+{fCol===c.k?<FilterDD vals={getUniq(c.k)} cur={fVal[c.k]} onPick={function(v){if(!v){var n=Object.assign({},fVal);delete n[c.k];setFVal(n);}else setFVal(Object.assign({},fVal,{[c.k]:v}));setFCol(null);}}/>:null}
 </div>;})}
 </div>
-{(function(){var PZ=20,totPg2=totalPg||1,pg3=Math.min(curPg,totPg2),start=(pg3-1)*PZ,paged=fl.slice(start,start+PZ);return paged.map(function(x,idx){var done=isComplete(x);var filled=getFilledCount(x);var dl=(x.downloads||[]).length;
+{(function(){var PZ=20,totPg2=totalPg||1,pg3=Math.min(curPg,totPg2),start=(pg3-1)*PZ,paged=fl.slice(start,start+PZ);return paged.map(function(x,idx){var done=isComplete(x);var filled=getFilledCount(x);var dl=(x.downloads||[]).length;var hasFill=filled>0;var hasDl=dl>0;var fillBg=done?"#dcfce7":hasFill?"#fff7ed":"#fee2e2";var fillColor=done?"#16a34a":hasFill?"#ea580c":"#dc2626";var dlColor=hasDl?"#1a56db":"#ccc";var dlText=hasDl?dl+"회":"-";
 return <div key={x.id} style={{display:"grid",gridTemplateColumns:gtc,borderBottom:BE,background:chk.has(x.id)?"#e8f0fe":idx%2===0?"#fff":"#fafafa",fontSize:13,alignItems:"center"}}>
 <div style={{padding:"6px 3px",textAlign:"center"}}><input type="checkbox" checked={chk.has(x.id)} onChange={function(){tog(x.id);}}/></div>
 <div style={{padding:"6px 4px",fontWeight:700,color:"#1a56db",cursor:"pointer",whiteSpace:"nowrap",textAlign:"center"}} onClick={function(){onSel(x.id);}}>{x.buildName||"-"}</div>
@@ -271,25 +271,26 @@ return <div key={x.id} style={{display:"grid",gridTemplateColumns:gtc,borderBott
 <div style={{padding:"6px 4px",color:"#666"}}>{x.factory||"-"}</div>
 <div style={{padding:"6px 4px",color:"#666"}}>{x.line||"-"}</div>
 <div style={{padding:"6px 4px",textAlign:"center",fontWeight:600}}>{x.quantity||"-"}</div>
-<div style={{padding:"6px 4px",textAlign:"center"}}><span style={{padding:"1px 4px",borderRadius:3,fontSize:10,fontWeight:700,background:done?"#dcfce7":filled>0?"#fff7ed":"#fee2e2",color:done?"#16a34a":filled>0?"#ea580c":"#dc2626"}}>{filled}/{PARTS.length}</span></div>
+<div style={{padding:"6px 4px",textAlign:"center"}}><span style={{padding:"1px 4px",borderRadius:3,fontSize:10,fontWeight:700,background:fillBg,color:fillColor}}>{filled}/{PARTS.length}</span></div>
 <div style={{padding:"6px 4px",textAlign:"center",fontSize:11}}>{done?<span style={{color:"#16a34a",fontWeight:700}}>완료</span>:<span style={{color:"#aaa"}}>미등록</span>}</div>
-<div style={{padding:"6px 4px",textAlign:"center",fontSize:10,color:dl>0?"#1a56db":"#ccc"}}>{dl>0?dl+"회":"-"}</div>
+<div style={{padding:"6px 4px",textAlign:"center",fontSize:10,color:dlColor}}>{dlText}</div>
 </div>;})})()}
 </div>
-{showPager&&<Pager cur={curPg} total={totalPg} onGo={setCurPg}/>}}
+{showPager?<Pager cur={curPg} total={totalPg} onGo={setCurPg}/>:null}
+</>}
 </div>);
 }
 function FilterDD({k,vals,cur,onPick}){var _s=useState(""),sq=_s[0],setSq=_s[1];var fv=vals.filter(function(v){return!sq||v.toLowerCase().includes(sq.toLowerCase());});return <div style={{position:"absolute",top:"100%",left:0,zIndex:50,background:"#fff",border:BC,borderRadius:3,boxShadow:"0 2px 8px rgba(0,0,0,.12)",padding:3,minWidth:120,maxHeight:220,display:"flex",flexDirection:"column"}} onClick={function(e){e.stopPropagation();}}>
 <input value={sq} onChange={function(e){setSq(e.target.value);}} placeholder="검색" style={{padding:"3px 6px",fontSize:11,border:BC,borderRadius:2,marginBottom:2,outline:"none"}}/>
 <div style={{overflowY:"auto",flex:1}}><div style={{padding:"2px 6px",fontSize:11,cursor:"pointer",color:"#1a56db",fontWeight:600}} onClick={function(){onPick(null);}}>전체</div>
 {fv.map(function(v){return <div key={v} style={{padding:"2px 6px",fontSize:11,cursor:"pointer",background:cur===v?"#e8f0fe":"transparent"}} onClick={function(){onPick(v);}}>{v}</div>;})}</div></div>;}
-function UploadPg({onAdd}){var _e=useState(null),err=_e[0],setErr=_e[1];var _b=useState(false),busy=_b[0],setBusy=_b[1];var ref=useRef();function go(e){var file=e.target.files&&e.target.files[0];if(!file)return;setBusy(true);setErr(null);parseFile(file,function(r){setBusy(false);onAdd(r);},function(m){setBusy(false);setErr(m);});if(ref.current)ref.current.value="";}return(<div style={{maxWidth:1400,margin:"0 auto",padding:16}}><div style={{background:"#fff",borderRadius:4,border:BD,padding:20}}><h2 style={{fontSize:15,fontWeight:700,marginBottom:4,color:"#222"}}>📋 업로드</h2><p style={{fontSize:12,color:"#888",marginBottom:14}}>.xlsx/.csv 업로드</p><div onClick={function(){ref.current.click();}} style={{border:"2px dashed #ccc",borderRadius:6,padding:"24px 16px",textAlign:"center",cursor:"pointer",background:"#fafafa"}}>{busy?<div style={{color:"#1a56db",fontWeight:600}}>⏳ 등록 중…</div>:<div><div style={{fontSize:24,marginBottom:4}}>📄</div><div style={{fontWeight:600,fontSize:13,color:"#555"}}>파일 선택</div></div>}</div><input ref={ref} type="file" accept=".xlsx,.xls,.csv" onChange={go} style={{display:"none"}}/>{err&&<div style={{marginTop:10,padding:"10px 12px",borderRadius:4,background:"#fee2e2",color:"#dc2626",fontSize:12,fontWeight:600}}>⚠ {err}</div>}</div></div>);}
+function UploadPg({onAdd}){var _e=useState(null),err=_e[0],setErr=_e[1];var _b=useState(false),busy=_b[0],setBusy=_b[1];var ref=useRef();function go(e){var file=e.target.files&&e.target.files[0];if(!file)return;setBusy(true);setErr(null);parseFile(file,function(r){setBusy(false);onAdd(r);},function(m){setBusy(false);setErr(m);});if(ref.current)ref.current.value="";}return(<div style={{maxWidth:1400,margin:"0 auto",padding:16}}><div style={{background:"#fff",borderRadius:4,border:BD,padding:20}}><h2 style={{fontSize:15,fontWeight:700,marginBottom:4,color:"#222"}}>📋 업로드</h2><p style={{fontSize:12,color:"#888",marginBottom:14}}>.xlsx/.csv 업로드</p><div onClick={function(){ref.current.click();}} style={{border:"2px dashed #ccc",borderRadius:6,padding:"24px 16px",textAlign:"center",cursor:"pointer",background:"#fafafa"}}>{busy?<div style={{color:"#1a56db",fontWeight:600}}>⏳ 등록 중…</div>:<div><div style={{fontSize:24,marginBottom:4}}>📄</div><div style={{fontWeight:600,fontSize:13,color:"#555"}}>파일 선택</div></div>}</div><input ref={ref} type="file" accept=".xlsx,.xls,.csv" onChange={go} style={{display:"none"}}/>{err?<div style={{marginTop:10,padding:"10px 12px",borderRadius:4,background:"#fee2e2",color:"#dc2626",fontSize:12,fontWeight:600}}>⚠ {err}</div>:null}</div></div>);}
 function RegPg({onOk,onX}){var _f=useState({affiliation:"",inspector:"",line:"",itemCode:"",itemName:"",color:"",buildName:"",quantity:"",uploadDate:todayStr(),packDate:"",photos:{},naSlots:{},notes:""}),form=_f[0],setForm=_f[1];function sf(k,v){setForm(function(p){return Object.assign({},p,{[k]:v});});}return(<div style={{maxWidth:800,margin:"0 auto",padding:16}}><div style={{background:"#fff",borderRadius:4,border:BD,padding:20}}><h2 style={{fontSize:15,fontWeight:700,marginBottom:14,color:"#222"}}>+ 신규 등록</h2><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:14}}><Fld l="소속" v={form.affiliation} s={function(v){sf("affiliation",v);}}/><Fld l="이름" v={form.inspector} s={function(v){sf("inspector",v);}}/><Fld l="공정/라인" v={form.line} s={function(v){sf("line",v);}}/><Fld l="품목코드" v={form.itemCode} s={function(v){sf("itemCode",v);}}/><Fld l="품목명" v={form.itemName} s={function(v){sf("itemName",v);}} w/><Fld l="색상" v={form.color} s={function(v){sf("color",v);}}/><Fld l="건명" v={form.buildName} s={function(v){sf("buildName",v);}}/><Fld l="수량" v={form.quantity} s={function(v){sf("quantity",v);}}/></div><PhotoSec photos={form.photos} naSlots={form.naSlots} onP={function(v){sf("photos",v);}} onN={function(v){sf("naSlots",v);}}/><div style={{display:"flex",gap:8,marginTop:14,justifyContent:"flex-end"}}><BW onClick={onX}>취소</BW><BW p onClick={function(){onOk(form);}}>등록</BW></div></div></div>);}
 function DetPg({item,onUpd,onDl,onBack}){if(!item)return null;return(
 <div style={{maxWidth:1000,margin:"0 auto",padding:16}}>
 <div style={{display:"flex",gap:8,marginBottom:12}}><button onClick={onBack} style={{padding:"8px 16px",borderRadius:20,border:BD,background:"#fff",color:"#475569",fontSize:13,fontWeight:600,cursor:"pointer",boxShadow:"0 1px 3px rgba(0,0,0,.05)"}}>← 목록</button><button onClick={onDl} style={{padding:"8px 20px",borderRadius:20,border:"none",background:"linear-gradient(135deg,#1e3a5f,#1a56db)",color:"#fff",fontSize:13,fontWeight:700,cursor:"pointer",boxShadow:"0 2px 8px rgba(26,86,219,.25)"}}>📥 다운로드</button></div>
 <div style={{background:"#fff",borderRadius:10,border:BD,padding:"20px 20px 16px",marginBottom:10,boxShadow:"0 1px 6px rgba(0,0,0,.05)"}}><div style={{fontSize:18,fontWeight:800,marginBottom:4,color:"#1e293b"}}>{item.buildName||"검사서"}</div><div style={{fontSize:12,color:"#888",marginBottom:14}}>{item.itemName}</div><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(130px,1fr))",gap:5}}><Chip l="소속" v={item.affiliation||"-"}/><Chip l="이름" v={item.inspector||"-"}/><Chip l="공정/라인" v={item.line||"-"}/><Chip l="품목코드" v={item.itemCode||"-"}/><Chip l="색상" v={item.color||"-"}/><Chip l="기준일" v={item.uploadDate||"-"}/><Chip l="최초포장일" v={item.packDate||"-"}/><Chip l="수량" v={item.quantity||"-"}/></div></div>
-{item.downloads&&item.downloads.length!==0&&<div style={{background:"#fff",borderRadius:8,border:BD,padding:16,marginBottom:10,boxShadow:"0 1px 4px rgba(0,0,0,.05)"}}><div style={{fontSize:13,fontWeight:700,marginBottom:6}}>📥 다운로드 이력</div><div style={{display:"flex",flexWrap:"wrap",gap:4}}>{item.downloads.map(function(d,i){return <span key={i} style={{padding:"2px 7px",borderRadius:3,background:"#e8f0fe",color:"#1a56db",fontSize:11}}>{i+1}회 — {d}</span>;})}</div></div>}
+{(item.downloads&&item.downloads.length!==0)?<div style={{background:"#fff",borderRadius:8,border:BD,padding:16,marginBottom:10,boxShadow:"0 1px 4px rgba(0,0,0,.05)"}}><div style={{fontSize:13,fontWeight:700,marginBottom:6}}>📥 다운로드 이력</div><div style={{display:"flex",flexWrap:"wrap",gap:4}}>{item.downloads.map(function(d,i){return <span key={i} style={{padding:"2px 7px",borderRadius:3,background:"#e8f0fe",color:"#1a56db",fontSize:11}}>{i+1}회 — {d}</span>;})}</div></div>:null}
 <div style={{background:"#fff",borderRadius:8,border:BD,padding:16,marginBottom:10,boxShadow:"0 1px 4px rgba(0,0,0,.05)"}}><div style={{fontSize:13,fontWeight:700,marginBottom:4}}>부위별 사진</div><div style={{fontSize:11,color:"#888",marginBottom:8}}>부위명 클릭 → N/A 전환</div><PhotoSec photos={item.photos||{}} naSlots={item.naSlots||{}} onP={function(v){onUpd({photos:v});}} onN={function(v){onUpd({naSlots:v});}}/></div>
 <div style={{background:"#fff",borderRadius:8,border:BD,padding:16,boxShadow:"0 1px 4px rgba(0,0,0,.05)"}}><div style={{fontSize:13,fontWeight:700,marginBottom:6}}>특이사항</div><textarea value={item.notes||""} onChange={function(e){onUpd({notes:e.target.value});}} rows={3} placeholder="입력…" style={{width:"100%",padding:7,borderRadius:3,border:BC,color:"#333",fontSize:12,resize:"vertical",outline:"none",boxSizing:"border-box"}}/></div>
 </div>);}
@@ -302,7 +303,7 @@ function addP(id){var inp=document.createElement("input");inp.type="file";inp.ac
 function rmP(id){var n=Object.assign({},photos);delete n[id];onP(n);}
 function togN(id){var n=Object.assign({},naSlots);if(n[id])delete n[id];else{n[id]=true;var p=Object.assign({},photos);delete p[id];onP(p);}onN(n);}
 return <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:5}}>{PARTS.map(function(pt){var isNa=naSlots&&naSlots[pt.id];var has=photos&&photos[pt.id];return <div key={pt.id} style={{borderRadius:8,border:"1px solid "+(isNa?"#fca5a5":"#e2e8f0"),background:isNa?"#fef2f2":"#fff",boxShadow:"0 1px 3px rgba(0,0,0,.05)",overflow:"hidden",opacity:isNa?0.7:1}}>
-<div style={{padding:"6px 8px",fontSize:10,fontWeight:700,color:isNa?"#dc2626":"#475569",borderBottom:BE,display:"flex",justifyContent:"space-between",cursor:"pointer",background:isNa?"#fef2f2":"#f8fafc",borderRadius:"8px 8px 0 0"}} onClick={function(){togN(pt.id);}}><span>{pt.l}{isNa?" (N/A)":""}</span>{has&&!isNa&&<span onClick={function(e){e.stopPropagation();rmP(pt.id);}} style={{cursor:"pointer",color:"#dc2626",fontSize:11}}>×</span>}</div>
+<div style={{padding:"6px 8px",fontSize:10,fontWeight:700,color:isNa?"#dc2626":"#475569",borderBottom:BE,display:"flex",justifyContent:"space-between",cursor:"pointer",background:isNa?"#fef2f2":"#f8fafc",borderRadius:"8px 8px 0 0"}} onClick={function(){togN(pt.id);}}><span>{pt.l}{isNa?" (N/A)":""}</span>{(has&&!isNa)?<span onClick={function(e){e.stopPropagation();rmP(pt.id);}} style={{cursor:"pointer",color:"#dc2626",fontSize:11}}>×</span>:null}</div>
 {isNa?<div style={{height:70,display:"flex",alignItems:"center",justifyContent:"center",color:"#dc2626",fontSize:11,fontWeight:600}}>해당 없음</div>:has?<img src={photos[pt.id]} style={{width:"100%",height:70,objectFit:"cover",display:"block"}} alt=""/>:<div onClick={function(){addP(pt.id);}} style={{height:70,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",color:"#aaa",fontSize:11}}>📷 추가</div>}
 </div>;})}</div>;
 }
