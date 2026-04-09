@@ -190,6 +190,7 @@ var _d2=useState(""),d2=_d2[0],setD2=_d2[1];
 var _sort=useState(null),sort=_sort[0],setSort=_sort[1];
 var _fCol=useState(null),fCol=_fCol[0],setFCol=_fCol[1];
 var _fVal=useState({}),fVal=_fVal[0],setFVal=_fVal[1];
+var _pg2=useState(1),curPg=_pg2[0],setCurPg=_pg2[1];
 function gv(x,k){if(k==="buildName")return x.buildName||"";if(k==="uploadDate")return x.uploadDate||"";if(k==="packDate")return x.packDate||"";if(k==="itemName")return x.itemName||"";if(k==="itemCode")return x.itemCode||"";if(k==="color")return x.color||"";if(k==="factory")return x.factory||"";if(k==="line")return x.line||"";if(k==="quantity")return x.quantity||"";if(k==="photo")return getFilledCount(x)+"/"+PARTS.length;if(k==="done")return isComplete(x)?"완료":"미등록";if(k==="dl")return(x.downloads||[]).length+"회";return"";}
 var base=items.filter(function(x){
 if(d1&&(x.uploadDate||"")<d1)return false;
@@ -205,6 +206,7 @@ return true;
 });
 if(sort){fl=fl.slice().sort(function(a,b){var va=gv(a,sort.k)||"",vb=gv(b,sort.k)||"";if(va<vb)return sort.d==="asc"?-1:1;if(va>vb)return sort.d==="asc"?1:-1;return 0;});}
 function getUniq(k){var s=new Set();items.forEach(function(x){var v=gv(x,k);if(v)s.add(v);});return Array.from(s).sort();}
+function resetPg(){setCurPg(1);}
 function togSort(k){if(sort&&sort.k===k){if(sort.d==="asc")setSort({k:k,d:"desc"});else setSort(null);}else setSort({k:k,d:"asc"});}
 function tog(id){var n=new Set(chk);if(n.has(id))n.delete(id);else n.add(id);setChk(n);}
 function togAll(){if(chk.size>=fl.length)setChk(new Set());else{var n=new Set();fl.forEach(function(x){n.add(x.id);});setChk(n);}}
@@ -217,11 +219,11 @@ return(
 <div style={{maxWidth:1400,margin:"0 auto",padding:"10px 16px"}}>
 <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
 <span style={{fontSize:12,color:"#555",fontWeight:600}}>기준일</span>
-<input type="date" value={d1} onChange={function(e){setD1(e.target.value);}} style={{padding:"4px 6px",border:BC,borderRadius:3,fontSize:12}}/>
+<input type="date" value={d1} onChange={function(e){setD1(e.target.value);resetPg();}} style={{padding:"4px 6px",border:BC,borderRadius:3,fontSize:12}}/>
 <span style={{color:"#aaa"}}>~</span>
-<input type="date" value={d2} onChange={function(e){setD2(e.target.value);}} style={{padding:"4px 6px",border:BC,borderRadius:3,fontSize:12}}/>
+<input type="date" value={d2} onChange={function(e){setD2(e.target.value);resetPg();}} style={{padding:"4px 6px",border:BC,borderRadius:3,fontSize:12}}/>
 <div style={{flex:1}}/>
-<input placeholder="검색" value={q} onChange={function(e){setQ(e.target.value);}} style={{padding:"5px 10px",border:BC,borderRadius:3,fontSize:13,width:160,outline:"none"}}/>
+<input placeholder="검색" value={q} onChange={function(e){setQ(e.target.value);resetPg();}} style={{padding:"5px 10px",border:BC,borderRadius:3,fontSize:13,width:160,outline:"none"}}/>
 <span style={{fontSize:12,color:"#888"}}>{fl.length}건</span>
 </div>
 <div style={{display:"flex",gap:8,marginBottom:10}}>
@@ -230,7 +232,7 @@ return(
 <div style={{flex:1,padding:"14px 16px",background:"linear-gradient(135deg,#fef2f2,#fff)",border:BD,borderRadius:8,borderLeft:"4px solid #dc2626",boxShadow:"0 1px 4px rgba(0,0,0,.05)"}}><div style={{fontSize:11,color:"#888"}}>⏳ 미등록</div><div style={{fontSize:22,fontWeight:800,color:"#dc2626"}}>{base.filter(function(x){return!isComplete(x);}).length}<span style={{fontSize:11,color:"#aaa",marginLeft:4}}>건</span></div></div>
 </div>
 <div style={{display:"flex",alignItems:"center",gap:0,marginBottom:8}}>
-{[{k:"all",l:"전체"},{k:"done",l:"완료"},{k:"todo",l:"미등록"}].map(function(t){return <div key={t.k} onClick={function(){setTab(t.k);}} style={{padding:"6px 16px",fontSize:12,fontWeight:tab===t.k?700:500,color:tab===t.k?"#fff":"#666",borderRadius:16,cursor:"pointer",background:tab===t.k?"#1a56db":"transparent"}}>{t.l}</div>;})}
+{[{k:"all",l:"전체"},{k:"done",l:"완료"},{k:"todo",l:"미등록"}].map(function(t){return <div key={t.k} onClick={function(){setTab(t.k);resetPg();}} style={{padding:"6px 16px",fontSize:12,fontWeight:tab===t.k?700:500,color:tab===t.k?"#fff":"#666",borderRadius:16,cursor:"pointer",background:tab===t.k?"#1a56db":"transparent"}}>{t.l}</div>;})}
 </div>
 {chk.size>0&&<div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6,padding:"5px 10px",background:"#e8f0fe",borderRadius:3,border:"1px solid #b6d4fe"}}>
 <span style={{fontSize:12,fontWeight:600,color:"#1a56db"}}>{chk.size}건 선택</span><div style={{flex:1}}/>
@@ -248,7 +250,7 @@ return <div key={c.k} style={{padding:"6px 4px",fontSize:12,fontWeight:700,color
 {fCol===c.k&&<FilterDD vals={getUniq(c.k)} cur={fVal[c.k]} onPick={function(v){if(!v){var n=Object.assign({},fVal);delete n[c.k];setFVal(n);}else setFVal(Object.assign({},fVal,{[c.k]:v}));setFCol(null);}}/>}
 </div>;})}
 </div>
-{fl.map(function(x,idx){var done=isComplete(x);var filled=getFilledCount(x);var dl=(x.downloads||[]).length;
+{(function(){var PZ=20,totPg=Math.ceil(fl.length/PZ)||1,pg3=Math.min(curPg,totPg),start=(pg3-1)*PZ,paged=fl.slice(start,start+PZ);return paged.map(function(x,idx){var done=isComplete(x);var filled=getFilledCount(x);var dl=(x.downloads||[]).length;
 return <div key={x.id} style={{display:"grid",gridTemplateColumns:gtc,borderBottom:BE,background:chk.has(x.id)?"#e8f0fe":idx%2===0?"#fff":"#fafafa",fontSize:13,alignItems:"center"}}>
 <div style={{padding:"6px 3px",textAlign:"center"}}><input type="checkbox" checked={chk.has(x.id)} onChange={function(){tog(x.id);}}/></div>
 <div style={{padding:"6px 4px",fontWeight:700,color:"#1a56db",cursor:"pointer",whiteSpace:"nowrap",textAlign:"center"}} onClick={function(){onSel(x.id);}}>{x.buildName||"-"}</div>
@@ -263,8 +265,13 @@ return <div key={x.id} style={{display:"grid",gridTemplateColumns:gtc,borderBott
 <div style={{padding:"6px 4px",textAlign:"center"}}><span style={{padding:"1px 4px",borderRadius:3,fontSize:10,fontWeight:700,background:done?"#dcfce7":filled>0?"#fff7ed":"#fee2e2",color:done?"#16a34a":filled>0?"#ea580c":"#dc2626"}}>{filled}/{PARTS.length}</span></div>
 <div style={{padding:"6px 4px",textAlign:"center",fontSize:11}}>{done?<span style={{color:"#16a34a",fontWeight:700}}>완료</span>:<span style={{color:"#aaa"}}>미등록</span>}</div>
 <div style={{padding:"6px 4px",textAlign:"center",fontSize:10,color:dl>0?"#1a56db":"#ccc"}}>{dl>0?dl+"회":"-"}</div>
-</div>;})}
-</div>}
+</div>;})})()}
+</div>
+{fl.length>20&&<div style={{display:"flex",justifyContent:"center",alignItems:"center",gap:4,padding:"10px 0"}}>
+<button onClick={function(){setCurPg(Math.max(1,curPg-1));}} disabled={curPg<=1} style={{padding:"4px 10px",border:BD,borderRadius:4,background:"#fff",cursor:curPg<=1?"not-allowed":"pointer",color:curPg<=1?"#ccc":"#333",fontSize:12}}>◀ 이전</button>
+{Array.from({length:Math.ceil(fl.length/20)},function(_,i){return i+1;}).map(function(p){return <button key={p} onClick={function(){setCurPg(p);}} style={{padding:"4px 10px",border:curPg===p?"1px solid #1a56db":BD,borderRadius:4,background:curPg===p?"#1a56db":"#fff",color:curPg===p?"#fff":"#333",fontSize:12,fontWeight:curPg===p?700:400,cursor:"pointer",minWidth:32}}>{p}</button>;})}
+<button onClick={function(){setCurPg(Math.min(Math.ceil(fl.length/20),curPg+1));}} disabled={curPg>=Math.ceil(fl.length/20)} style={{padding:"4px 10px",border:BD,borderRadius:4,background:"#fff",cursor:curPg>=Math.ceil(fl.length/20)?"not-allowed":"pointer",color:curPg>=Math.ceil(fl.length/20)?"#ccc":"#333",fontSize:12}}>다음 ▶</button>
+</div>}}
 </div>);
 }
 function FilterDD({k,vals,cur,onPick}){var _s=useState(""),sq=_s[0],setSq=_s[1];var fv=vals.filter(function(v){return!sq||v.toLowerCase().includes(sq.toLowerCase());});return <div style={{position:"absolute",top:"100%",left:0,zIndex:50,background:"#fff",border:BC,borderRadius:3,boxShadow:"0 2px 8px rgba(0,0,0,.12)",padding:3,minWidth:120,maxHeight:220,display:"flex",flexDirection:"column"}} onClick={function(e){e.stopPropagation();}}>
