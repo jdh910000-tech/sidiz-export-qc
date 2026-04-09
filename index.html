@@ -222,6 +222,7 @@ function handleDel(){if(!cfm){setCfm(true);return;}onBulkDel(Array.from(chk));se
 useEffect(function(){setCfm(false);},[chk.size]);
 var cp='5px 3px';
 var cols=[{k:"buildName",l:"건명",w:"150px"},{k:"uploadDate",l:"기준일",w:"86px"},{k:"packDate",l:"최초포장일",w:"86px"},{k:"itemName",l:"품목명",w:"1fr"},{k:"itemCode",l:"품목코드",w:"105px"},{k:"color",l:"색상",w:"55px"},{k:"factory",l:"생산처",w:"75px"},{k:"line",l:"공정/라인",w:"80px"},{k:"quantity",l:"수량",w:"46px"},{k:"photo",l:"사진",w:"55px"},{k:"done",l:"완료여부",w:"60px"},{k:"dl",l:"다운이력",w:"55px"}];
+var totalPg=Math.ceil(fl.length/20);var showPager=fl.length>20;var hasChk=chk.size>0;
 var gtc="30px "+cols.map(function(c){return c.w;}).join(" ");
 return(
 <div style={{maxWidth:1400,margin:"0 auto",padding:"10px 16px"}}>
@@ -242,7 +243,7 @@ return(
 <div style={{display:"flex",alignItems:"center",gap:0,marginBottom:8}}>
 {[{k:"all",l:"전체"},{k:"done",l:"완료"},{k:"todo",l:"미등록"}].map(function(t){return <div key={t.k} onClick={function(){setTab(t.k);resetPg();}} style={{padding:"6px 16px",fontSize:12,fontWeight:tab===t.k?700:500,color:tab===t.k?"#fff":"#666",borderRadius:16,cursor:"pointer",background:tab===t.k?"#1a56db":"transparent"}}>{t.l}</div>;})}
 </div>
-{chk.size>0&&<div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6,padding:"5px 10px",background:"#e8f0fe",borderRadius:3,border:"1px solid #b6d4fe"}}>
+{hasChk&&<div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6,padding:"5px 10px",background:"#e8f0fe",borderRadius:3,border:"1px solid #b6d4fe"}}>
 <span style={{fontSize:12,fontWeight:600,color:"#1a56db"}}>{chk.size}건 선택</span><div style={{flex:1}}/>
 <BW p onClick={function(){onBulkDl(Array.from(chk));setChk(new Set());}} style={{fontSize:11,padding:"3px 10px"}}>📥 다운로드</BW>
 <BW d onClick={handleDel} style={{fontSize:11,padding:"3px 10px"}}>{cfm?"⚠ 정말 삭제?":"🗑 삭제"}</BW>
@@ -258,7 +259,7 @@ return <div key={c.k} style={{padding:"6px 4px",fontSize:12,fontWeight:700,color
 {fCol===c.k&&<FilterDD vals={getUniq(c.k)} cur={fVal[c.k]} onPick={function(v){if(!v){var n=Object.assign({},fVal);delete n[c.k];setFVal(n);}else setFVal(Object.assign({},fVal,{[c.k]:v}));setFCol(null);}}/>}
 </div>;})}
 </div>
-{(function(){var PZ=20,totPg=Math.ceil(fl.length/PZ)||1,pg3=Math.min(curPg,totPg),start=(pg3-1)*PZ,paged=fl.slice(start,start+PZ);return paged.map(function(x,idx){var done=isComplete(x);var filled=getFilledCount(x);var dl=(x.downloads||[]).length;
+{(function(){var PZ=20,totPg2=totalPg||1,pg3=Math.min(curPg,totPg2),start=(pg3-1)*PZ,paged=fl.slice(start,start+PZ);return paged.map(function(x,idx){var done=isComplete(x);var filled=getFilledCount(x);var dl=(x.downloads||[]).length;
 return <div key={x.id} style={{display:"grid",gridTemplateColumns:gtc,borderBottom:BE,background:chk.has(x.id)?"#e8f0fe":idx%2===0?"#fff":"#fafafa",fontSize:13,alignItems:"center"}}>
 <div style={{padding:"6px 3px",textAlign:"center"}}><input type="checkbox" checked={chk.has(x.id)} onChange={function(){tog(x.id);}}/></div>
 <div style={{padding:"6px 4px",fontWeight:700,color:"#1a56db",cursor:"pointer",whiteSpace:"nowrap",textAlign:"center"}} onClick={function(){onSel(x.id);}}>{x.buildName||"-"}</div>
@@ -275,7 +276,7 @@ return <div key={x.id} style={{display:"grid",gridTemplateColumns:gtc,borderBott
 <div style={{padding:"6px 4px",textAlign:"center",fontSize:10,color:dl>0?"#1a56db":"#ccc"}}>{dl>0?dl+"회":"-"}</div>
 </div>;})})()}
 </div>
-{fl.length>20&&<Pager cur={curPg} total={Math.ceil(fl.length/20)} onGo={setCurPg}/>}}
+{showPager&&<Pager cur={curPg} total={totalPg} onGo={setCurPg}/>}}
 </div>);
 }
 function FilterDD({k,vals,cur,onPick}){var _s=useState(""),sq=_s[0],setSq=_s[1];var fv=vals.filter(function(v){return!sq||v.toLowerCase().includes(sq.toLowerCase());});return <div style={{position:"absolute",top:"100%",left:0,zIndex:50,background:"#fff",border:BC,borderRadius:3,boxShadow:"0 2px 8px rgba(0,0,0,.12)",padding:3,minWidth:120,maxHeight:220,display:"flex",flexDirection:"column"}} onClick={function(e){e.stopPropagation();}}>
@@ -288,7 +289,7 @@ function DetPg({item,onUpd,onDl,onBack}){if(!item)return null;return(
 <div style={{maxWidth:1000,margin:"0 auto",padding:16}}>
 <div style={{display:"flex",gap:8,marginBottom:12}}><button onClick={onBack} style={{padding:"8px 16px",borderRadius:20,border:BD,background:"#fff",color:"#475569",fontSize:13,fontWeight:600,cursor:"pointer",boxShadow:"0 1px 3px rgba(0,0,0,.05)"}}>← 목록</button><button onClick={onDl} style={{padding:"8px 20px",borderRadius:20,border:"none",background:"linear-gradient(135deg,#1e3a5f,#1a56db)",color:"#fff",fontSize:13,fontWeight:700,cursor:"pointer",boxShadow:"0 2px 8px rgba(26,86,219,.25)"}}>📥 다운로드</button></div>
 <div style={{background:"#fff",borderRadius:10,border:BD,padding:"20px 20px 16px",marginBottom:10,boxShadow:"0 1px 6px rgba(0,0,0,.05)"}}><div style={{fontSize:18,fontWeight:800,marginBottom:4,color:"#1e293b"}}>{item.buildName||"검사서"}</div><div style={{fontSize:12,color:"#888",marginBottom:14}}>{item.itemName}</div><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(130px,1fr))",gap:5}}><Chip l="소속" v={item.affiliation||"-"}/><Chip l="이름" v={item.inspector||"-"}/><Chip l="공정/라인" v={item.line||"-"}/><Chip l="품목코드" v={item.itemCode||"-"}/><Chip l="색상" v={item.color||"-"}/><Chip l="기준일" v={item.uploadDate||"-"}/><Chip l="최초포장일" v={item.packDate||"-"}/><Chip l="수량" v={item.quantity||"-"}/></div></div>
-{(item.downloads||[]).length>0&&<div style={{background:"#fff",borderRadius:8,border:BD,padding:16,marginBottom:10,boxShadow:"0 1px 4px rgba(0,0,0,.05)"}}><div style={{fontSize:13,fontWeight:700,marginBottom:6}}>📥 다운로드 이력</div><div style={{display:"flex",flexWrap:"wrap",gap:4}}>{item.downloads.map(function(d,i){return <span key={i} style={{padding:"2px 7px",borderRadius:3,background:"#e8f0fe",color:"#1a56db",fontSize:11}}>{i+1}회 — {d}</span>;})}</div></div>}
+{item.downloads&&item.downloads.length!==0&&<div style={{background:"#fff",borderRadius:8,border:BD,padding:16,marginBottom:10,boxShadow:"0 1px 4px rgba(0,0,0,.05)"}}><div style={{fontSize:13,fontWeight:700,marginBottom:6}}>📥 다운로드 이력</div><div style={{display:"flex",flexWrap:"wrap",gap:4}}>{item.downloads.map(function(d,i){return <span key={i} style={{padding:"2px 7px",borderRadius:3,background:"#e8f0fe",color:"#1a56db",fontSize:11}}>{i+1}회 — {d}</span>;})}</div></div>}
 <div style={{background:"#fff",borderRadius:8,border:BD,padding:16,marginBottom:10,boxShadow:"0 1px 4px rgba(0,0,0,.05)"}}><div style={{fontSize:13,fontWeight:700,marginBottom:4}}>부위별 사진</div><div style={{fontSize:11,color:"#888",marginBottom:8}}>부위명 클릭 → N/A 전환</div><PhotoSec photos={item.photos||{}} naSlots={item.naSlots||{}} onP={function(v){onUpd({photos:v});}} onN={function(v){onUpd({naSlots:v});}}/></div>
 <div style={{background:"#fff",borderRadius:8,border:BD,padding:16,boxShadow:"0 1px 4px rgba(0,0,0,.05)"}}><div style={{fontSize:13,fontWeight:700,marginBottom:6}}>특이사항</div><textarea value={item.notes||""} onChange={function(e){onUpd({notes:e.target.value});}} rows={3} placeholder="입력…" style={{width:"100%",padding:7,borderRadius:3,border:BC,color:"#333",fontSize:12,resize:"vertical",outline:"none",boxSizing:"border-box"}}/></div>
 </div>);}
