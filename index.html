@@ -221,7 +221,7 @@ function togAll(){if(chk.size>=fl.length)setChk(new Set());else{var n=new Set();
 function handleDel(){if(!cfm){setCfm(true);return;}onBulkDel(Array.from(chk));setChk(new Set());setCfm(false);}
 useEffect(function(){setCfm(false);},[chk.size]);
 var cp='5px 3px';
-var cols=[{k:"buildName",l:"건명",w:"150px"},{k:"uploadDate",l:"기준일",w:"82px"},{k:"packDate",l:"최초포장일",w:"82px"},{k:"itemName",l:"품목명",w:"300px"},{k:"itemCode",l:"품목코드",w:"105px"},{k:"color",l:"색상",w:"55px"},{k:"factory",l:"생산처",w:"68px"},{k:"line",l:"공정/라인",w:"100px"},{k:"quantity",l:"수량",w:"50px"},{k:"photo",l:"사진",w:"50px"},{k:"done",l:"완료여부",w:"62px"},{k:"dl",l:"다운이력",w:"55px"}];
+var cols=[{k:"buildName",l:"건명",w:"260px"},{k:"uploadDate",l:"기준일",w:"80px"},{k:"packDate",l:"최초포장일",w:"80px"},{k:"itemName",l:"품목명",w:"410px"},{k:"itemCode",l:"품목코드",w:"100px"},{k:"color",l:"색상",w:"50px"},{k:"factory",l:"생산처",w:"62px"},{k:"line",l:"공정/라인",w:"90px"},{k:"quantity",l:"수량",w:"45px"},{k:"photo",l:"사진",w:"48px"},{k:"done",l:"완료여부",w:"58px"},{k:"dl",l:"다운이력",w:"55px"}];
 var totalPg=Math.ceil(fl.length/20);var showPager=fl.length>20;var hasChk=chk.size>0;var allChk=chk.size>=fl.length&&fl.length>0;
 var gtc="30px "+cols.map(function(c){return c.w;}).join(" ");
 return(
