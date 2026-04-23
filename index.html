@@ -21,10 +21,11 @@ var SB_H={"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,"Content-Type":"appli
 function sbF(p,o){return fetch(SB_URL+"/rest/v1/"+p,Object.assign({headers:SB_H},o||{}));}
 function toJS(r){return{id:r.id,buildName:r.build_name||"",itemCode:r.item_code||"",itemName:r.item_name||"",color:r.color||"",factory:r.factory||"",affiliation:r.affiliation||"",line:r.line||"",inspector:r.inspector||"",planBatch:r.plan_batch||"",packDate:r.pack_date||"",uploadDate:r.upload_date||"",quantity:r.quantity||"",photos:r.photos||{},naSlots:r.na_slots||{},notes:r.notes||"",downloads:r.downloads||[]};}
 function toDB(x){return{build_name:x.buildName,item_code:x.itemCode,item_name:x.itemName,color:x.color,factory:x.factory,affiliation:x.affiliation,line:x.line,inspector:x.inspector,plan_batch:x.planBatch,pack_date:x.packDate,upload_date:x.uploadDate,quantity:x.quantity,photos:x.photos||{},na_slots:x.naSlots||{},notes:x.notes||"",downloads:x.downloads||[]};}
-function sbLoad(){return sbF("export_inspections?order=created_at.desc,id.desc").then(function(r){return r.json();}).then(function(rows){return rows.map(toJS);});}
+function sbLoad(){return sbF("export_inspections?select=id,build_name,item_code,item_name,color,factory,affiliation,line,inspector,plan_batch,pack_date,upload_date,quantity,na_slots,notes,downloads,created_at&order=created_at.desc,id.desc").then(function(r){return r.json();}).then(function(rows){return rows.map(toJS);});}
 function sbInsert(items){return sbF("export_inspections",{method:"POST",body:JSON.stringify(items.map(toDB))}).then(function(r){return r.json();}).then(function(rows){return rows.map(toJS);});}
 function sbUpdate(id,f){var b={};if(f.photos!==undefined)b.photos=f.photos;if(f.naSlots!==undefined)b.na_slots=f.naSlots;if(f.notes!==undefined)b.notes=f.notes;if(f.downloads!==undefined)b.downloads=f.downloads;return sbF("export_inspections?id=eq."+id,{method:"PATCH",body:JSON.stringify(b)});}
 function sbDelete(ids){return sbF("export_inspections?id=in.("+ids.join(",")+")",{method:"DELETE"});}
+function sbLoadOne(id){return sbF("export_inspections?id=eq."+id).then(function(r){return r.json();}).then(function(rows){return rows.length?toJS(rows[0]):null;});}
 function r16(d,o){return d[o]|(d[o+1]<<8);}
 function r32(d,o){return(d[o]|(d[o+1]<<8)|(d[o+2]<<16)|(d[o+3]<<24))>>>0;}
 function unzip(d){var f={},ep=-1;for(var i=d.length-22;i>=0;i--){if(d[i]===80&&d[i+1]===75&&d[i+2]===5&&d[i+3]===6){ep=i;break;}}if(ep<0)throw new Error("ZIP");var ne=r16(d,ep+10),co=r32(d,ep+16),p=co;for(var e=0;e<ne;e++){if(p+46>d.length)break;var cm=r16(d,p+10),cs=r32(d,p+20),us=r32(d,p+24),nl=r16(d,p+28),el=r16(d,p+30),cl=r16(d,p+32),lo=r32(d,p+42);var nm=new TextDecoder().decode(d.slice(p+46,p+46+nl));if(lo+30<d.length){var ll=r16(d,lo+26),le=r16(d,lo+28),ds=lo+30+ll+le;if(cm===0)f[nm]=d.slice(ds,ds+us);else if(cm===8)f[nm]={compressed:d.slice(ds,ds+cs)};}p+=46+nl+el+cl;}return f;}
@@ -55,8 +56,8 @@ function sc(rf,s,st){return'<c r="'+rf+'"'+(st?' s="'+st+'"':'')+' t="s"><v>'+gi
 function ec(rf,st){return'<c r="'+rf+'" s="'+st+'"/>';}
 function rw(r,ht,s,ov){var o='<row r="'+r+'" spans="2:16" ht="'+ht+'" customHeight="1">';var L="BCDEFGHIJKLMNOP";for(var i=0;i<15;i++){var ref=L[i]+r;o+=(ov&&ov[ref])?ov[ref]:ec(ref,s);}return o+'</row>';}
 var na=item.naSlots||{},ph=item.photos||{};
-var PL=[["헤드레스트","등판","럼버"],["좌판 / 등좌판","틸트","팔걸이"],["중심봉","베이스","후레임"],["캐스터","포장철물","제품사진"],["자기학습노트","박스사진","설명서"]];
-var PID=[["headrest","backrest","lumbar"],["seat","tilt","armrest"],["cylinder","base","frame"],["caster","packHW","productPhoto"],["learningNote","boxPhoto","manual"]];
+var PL=[["헤드레스트","등판","럼버"],["좌판 / 등좌판","틸트","팔걸이"],["중심봉","베이스","후레임"],["캐스터","포장철물","제품사진"],["자기학습노트","박스사진",""]];
+var PID=[["headrest","backrest","lumbar"],["seat","tilt","armrest"],["cylinder","base","frame"],["caster","packHW","productPhoto"],["learningNote","boxPhoto",""]];
 var GS=[10,18,26,34,42];
 var imgs=[];
 for(var g=0;g<5;g++){for(var ci=0;ci<3;ci++){var pid=PID[g][ci];if(!pid)continue;var pr=GS[g]+1,pc=[1,6,11][ci];if(ph[pid]&&!na[pid]){var d=ph[pid].split(","),mm=d[0].match(/:(.*?);/),mt=mm?mm[1]:"image/png";imgs.push({row:pr,col:pc,data:b64toUint8(d[1]),ext:mt.includes("png")?"png":"jpeg",mime:mt});}}}
@@ -76,18 +77,15 @@ sd+=sc("P7",String(item.quantity||""),15)+'</row>';
 sd+=rw(8,"34.5",28,{P8:ec("P8",15)});
 sd+='<row r="9" ht="9.95" customHeight="1"/>';
 for(var g=0;g<5;g++){var gs=GS[g];var ov={};for(var ci=0;ci<3;ci++){var lc=["B","G","L"][ci],pid=PID[g][ci],lbl=PL[g][ci];if(!lbl){continue;}if(na[pid])lbl+=" (해당없음)";ov[lc+gs]=sc(lc+gs,lbl,9);}sd+=rw(gs,"29.25",9,ov);for(var pr=gs+1;pr<=gs+7;pr++){var ov2={};if(pr===gs+1){for(var ci=0;ci<3;ci++){var pid=PID[g][ci];if(!pid)continue;if(na[pid]){var mc=["D","I","N"][ci];ov2[mc+pr]=sc(mc+pr,"해당없음",8);}}}sd+=rw(pr,"29.25",8,ov2);}}
-sd+='<row r="50" ht="9.95" customHeight="1"/>';
-sd+='<row r="51" spans="2:16" ht="22.5" customHeight="1">'+sc("B51","특이사항",9)+ec("C51",9)+ec("D51",9)+ec("E51",9)+ec("F51",9)+ec("G51",9)+ec("H51",9)+ec("I51",9)+ec("J51",9)+ec("K51",9)+ec("L51",9)+ec("M51",9)+ec("N51",9)+ec("O51",9)+ec("P51",9)+'</row>';
-sd+='<row r="52" spans="2:16" ht="40" customHeight="1">'+sc("B52",item.notes||"",28)+ec("C52",28)+ec("D52",28)+ec("E52",28)+ec("F52",28)+ec("G52",28)+ec("H52",28)+ec("I52",28)+ec("J52",28)+ec("K52",28)+ec("L52",28)+ec("M52",28)+ec("N52",28)+ec("O52",28)+ec("P52",28)+'</row>';
 sd+='</sheetData>';
 var mg='<mergeCells>';
 mg+='<mergeCell ref="B2:C4"/><mergeCell ref="D2:L4"/><mergeCell ref="M2:N2"/><mergeCell ref="O2:P2"/><mergeCell ref="M3:N4"/><mergeCell ref="O3:P4"/>';
 mg+='<mergeCell ref="B6:C6"/><mergeCell ref="D6:E6"/><mergeCell ref="F6:G6"/><mergeCell ref="H6:I6"/><mergeCell ref="J6:K6"/><mergeCell ref="L6:M6"/><mergeCell ref="N6:O6"/>';
 mg+='<mergeCell ref="B7:C8"/><mergeCell ref="D7:E8"/><mergeCell ref="F7:G8"/><mergeCell ref="H7:I8"/><mergeCell ref="J7:K8"/><mergeCell ref="L7:M8"/><mergeCell ref="N7:O8"/><mergeCell ref="P7:P8"/>';
 GS.forEach(function(gs){mg+='<mergeCell ref="B'+gs+':F'+gs+'"/><mergeCell ref="G'+gs+':K'+gs+'"/><mergeCell ref="L'+gs+':P'+gs+'"/><mergeCell ref="B'+(gs+1)+':F'+(gs+7)+'"/><mergeCell ref="G'+(gs+1)+':K'+(gs+7)+'"/><mergeCell ref="L'+(gs+1)+':P'+(gs+7)+'"/>';});
-mg+='<mergeCell ref="B51:P51"/><mergeCell ref="B52:P52"/></mergeCells>';
+mg+='</mergeCells>';
 var hI=imgs.length>0;
-var wsXml=XD+'<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheetPr><tabColor rgb="FFFF0000"/><pageSetUpPr fitToPage="1"/></sheetPr><dimension ref="B1:Q52"/><sheetViews><sheetView showGridLines="0" view="pageBreakPreview" zoomScale="85" zoomScaleNormal="100" zoomScaleSheetLayoutView="85" workbookViewId="0"/></sheetViews><sheetFormatPr defaultColWidth="12.5" defaultRowHeight="23.25" customHeight="1"/>'+CL+sd+mg+(hI?'<drawing r:id="rId2"/>':'')+'</worksheet>';
+var wsXml=XD+'<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheetPr><tabColor rgb="FFFF0000"/><pageSetUpPr fitToPage="1"/></sheetPr><dimension ref="B1:Q49"/><sheetViews><sheetView showGridLines="0" view="pageBreakPreview" zoomScale="85" zoomScaleNormal="100" zoomScaleSheetLayoutView="85" workbookViewId="0"/></sheetViews><sheetFormatPr defaultColWidth="12.5" defaultRowHeight="23.25" customHeight="1"/>'+CL+sd+mg+(hI?'<drawing r:id="rId2"/>':'')+'</worksheet>';
 var sstXml=XD+'<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="'+ss.length+'" uniqueCount="'+ss.length+'">';
 ss.forEach(function(s){sstXml+='<si><t>'+s+'</t></si>';});sstXml+='</sst>';
 var zf={};
@@ -135,7 +133,7 @@ function crc(d) { var t = []; for (var n = 0; n < 256; n++) { var c = n; for (va
 /* ================================================================ HELPERS ================================================================ */
 function safe(v){if(v==null)return"";var s=String(v);if(s==="undefined"||s==="null"||s==="NaN")return"";return s.trim();}
 var PARTS=[
-{id:"headrest",l:"헤드레스트"},{id:"backrest",l:"등판"},{id:"lumbar",l:"럼버"},{id:"seat",l:"좌판/등좌판"},{id:"tilt",l:"틸트"},{id:"armrest",l:"팔걸이"},{id:"cylinder",l:"중심봉"},{id:"base",l:"베이스"},{id:"frame",l:"후레임"},{id:"caster",l:"캐스터"},{id:"packHW",l:"포장철물"},{id:"productPhoto",l:"제품사진"},{id:"learningNote",l:"자기학습노트"},{id:"boxPhoto",l:"박스사진"},{id:"manual",l:"설명서"},];
+{id:"headrest",l:"헤드레스트"},{id:"backrest",l:"등판"},{id:"lumbar",l:"럼버"},{id:"seat",l:"좌판/등좌판"},{id:"tilt",l:"틸트"},{id:"armrest",l:"팔걸이"},{id:"cylinder",l:"중심봉"},{id:"base",l:"베이스"},{id:"frame",l:"후레임"},{id:"caster",l:"캐스터"},{id:"packHW",l:"포장철물"},{id:"productPhoto",l:"제품사진"},{id:"learningNote",l:"자기학습노트"},{id:"boxPhoto",l:"박스사진"},];
 var INSP={"도장라인":"이도우","재봉라인":"최중락","조립1":"엄일용","조립2":"윤영태","조립5":"이도우"};
 function getInsp(fc){if(!fc)return"";for(var k in INSP){if(fc.includes(k))return INSP[k];}return"";}
 function isComplete(item){var na=item.naSlots||{};for(var i=0;i<PARTS.length;i++){if(!na[PARTS[i].id]&&!(item.photos&&item.photos[PARTS[i].id]))return false;}return true;}
@@ -183,7 +181,7 @@ return(
 {pg==="list"?<><BW onClick={function(){setPg("upload");}}>📋 업로드</BW><BW p onClick={function(){setPg("register");}}>+ 등록</BW></>:null}
 </div></div></div>
 {toast?<div style={{position:"fixed",bottom:24,left:"50%",transform:"translateX(-50%)",padding:"10px 24px",borderRadius:20,background:"linear-gradient(135deg,#1e3a5f,#1a56db)",color:"#fff",fontSize:13,fontWeight:600,zIndex:999,boxShadow:"0 4px 16px rgba(26,86,219,.3)"}}>{toast}</div>:null}
-{pg==="list"?<ListPg items={items} onSel={function(id){setSid(id);setPg("detail");}} onBulkDel={bulkDel} onBulkDl={bulkDl}/>:null}
+{pg==="list"?<ListPg items={items} onSel={function(id){sbLoadOne(id).then(function(full){if(full){setItems(items.map(function(x){return x.id===id?full:x;}));}setSid(id);setPg("detail");});}} onBulkDel={bulkDel} onBulkDl={bulkDl}/>:null}
 {pg==="upload"?<UploadPg onAdd={addAll}/>:null}
 {pg==="register"?<RegPg onOk={function(f){addAll([f]);}} onX={function(){setPg("list");}}/>:null}
 {(pg==="detail"&&sid)?<DetPg item={items.find(function(x){return x.id===sid;})} onUpd={function(p){upd(sid,p);}} onDl={function(){bulkDl([sid]);}} onBack={function(){setPg("list");}}/>:null}
