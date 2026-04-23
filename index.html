@@ -56,8 +56,8 @@ function sc(rf,s,st){return'<c r="'+rf+'"'+(st?' s="'+st+'"':'')+' t="s"><v>'+gi
 function ec(rf,st){return'<c r="'+rf+'" s="'+st+'"/>';}
 function rw(r,ht,s,ov){var o='<row r="'+r+'" spans="2:16" ht="'+ht+'" customHeight="1">';var L="BCDEFGHIJKLMNOP";for(var i=0;i<15;i++){var ref=L[i]+r;o+=(ov&&ov[ref])?ov[ref]:ec(ref,s);}return o+'</row>';}
 var na=item.naSlots||{},ph=item.photos||{};
-var PL=[["헤드레스트","등판","럼버"],["좌판 / 등좌판","틸트","팔걸이"],["중심봉","베이스","후레임"],["캐스터","포장철물","제품사진"],["자기학습노트","박스사진",""]];
-var PID=[["headrest","backrest","lumbar"],["seat","tilt","armrest"],["cylinder","base","frame"],["caster","packHW","productPhoto"],["learningNote","boxPhoto",""]];
+var PL=[["헤드레스트","등판","럼버"],["좌판 / 등좌판","틸트","팔걸이"],["중심봉","베이스","후레임"],["캐스터","포장철물","제품사진"],["자기학습노트","박스사진","설명서"]];
+var PID=[["headrest","backrest","lumbar"],["seat","tilt","armrest"],["cylinder","base","frame"],["caster","packHW","productPhoto"],["learningNote","boxPhoto","manual"]];
 var GS=[10,18,26,34,42];
 var imgs=[];
 for(var g=0;g<5;g++){for(var ci=0;ci<3;ci++){var pid=PID[g][ci];if(!pid)continue;var pr=GS[g]+1,pc=[1,6,11][ci];if(ph[pid]&&!na[pid]){var d=ph[pid].split(","),mm=d[0].match(/:(.*?);/),mt=mm?mm[1]:"image/png";imgs.push({row:pr,col:pc,data:b64toUint8(d[1]),ext:mt.includes("png")?"png":"jpeg",mime:mt});}}}
@@ -133,7 +133,7 @@ function crc(d) { var t = []; for (var n = 0; n < 256; n++) { var c = n; for (va
 /* ================================================================ HELPERS ================================================================ */
 function safe(v){if(v==null)return"";var s=String(v);if(s==="undefined"||s==="null"||s==="NaN")return"";return s.trim();}
 var PARTS=[
-{id:"headrest",l:"헤드레스트"},{id:"backrest",l:"등판"},{id:"lumbar",l:"럼버"},{id:"seat",l:"좌판/등좌판"},{id:"tilt",l:"틸트"},{id:"armrest",l:"팔걸이"},{id:"cylinder",l:"중심봉"},{id:"base",l:"베이스"},{id:"frame",l:"후레임"},{id:"caster",l:"캐스터"},{id:"packHW",l:"포장철물"},{id:"productPhoto",l:"제품사진"},{id:"learningNote",l:"자기학습노트"},{id:"boxPhoto",l:"박스사진"},];
+{id:"headrest",l:"헤드레스트"},{id:"backrest",l:"등판"},{id:"lumbar",l:"럼버"},{id:"seat",l:"좌판/등좌판"},{id:"tilt",l:"틸트"},{id:"armrest",l:"팔걸이"},{id:"cylinder",l:"중심봉"},{id:"base",l:"베이스"},{id:"frame",l:"후레임"},{id:"caster",l:"캐스터"},{id:"packHW",l:"포장철물"},{id:"productPhoto",l:"제품사진"},{id:"learningNote",l:"자기학습노트"},{id:"boxPhoto",l:"박스사진"},{id:"manual",l:"설명서"},];
 var INSP={"도장라인":"이도우","재봉라인":"최중락","조립1":"엄일용","조립2":"윤영태","조립5":"이도우"};
 function getInsp(fc){if(!fc)return"";for(var k in INSP){if(fc.includes(k))return INSP[k];}return"";}
 function isComplete(item){var na=item.naSlots||{},pk=item.photoKeys||[],ph=item.photos||{};for(var i=0;i<PARTS.length;i++){var pid=PARTS[i].id;if(!na[pid]&&!ph[pid]&&pk.indexOf(pid)<0)return false;}return true;}
