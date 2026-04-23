@@ -77,15 +77,16 @@ sd+=sc("P7",String(item.quantity||""),15)+'</row>';
 sd+=rw(8,"34.5",28,{P8:ec("P8",15)});
 sd+='<row r="9" ht="9.95" customHeight="1"/>';
 for(var g=0;g<5;g++){var gs=GS[g];var ov={};for(var ci=0;ci<3;ci++){var lc=["B","G","L"][ci],pid=PID[g][ci],lbl=PL[g][ci];if(!lbl){continue;}if(na[pid])lbl+=" (해당없음)";ov[lc+gs]=sc(lc+gs,lbl,9);}sd+=rw(gs,"29.25",9,ov);for(var pr=gs+1;pr<=gs+7;pr++){var ov2={};if(pr===gs+1){for(var ci=0;ci<3;ci++){var pid=PID[g][ci];if(!pid)continue;if(na[pid]){var mc=["D","I","N"][ci];ov2[mc+pr]=sc(mc+pr,"해당없음",8);}}}sd+=rw(pr,"29.25",8,ov2);}}
+var notesText=item.notes||"";if(notesText){sd+='<row r="50" ht="9.95" customHeight="1"/>';sd+='<row r="51" spans="2:16" ht="25.5" customHeight="1">'+sc("B51","특이사항",9)+ec("C51",9)+ec("D51",9)+ec("E51",9)+ec("F51",9)+ec("G51",9)+ec("H51",9)+ec("I51",9)+ec("J51",9)+ec("K51",9)+ec("L51",9)+ec("M51",9)+ec("N51",9)+ec("O51",9)+ec("P51",9)+'</row>';sd+='<row r="52" spans="2:16" ht="60" customHeight="1">'+sc("B52",notesText,8)+ec("C52",8)+ec("D52",8)+ec("E52",8)+ec("F52",8)+ec("G52",8)+ec("H52",8)+ec("I52",8)+ec("J52",8)+ec("K52",8)+ec("L52",8)+ec("M52",8)+ec("N52",8)+ec("O52",8)+ec("P52",8)+'</row>';}
 sd+='</sheetData>';
 var mg='<mergeCells>';
 mg+='<mergeCell ref="B2:C4"/><mergeCell ref="D2:L4"/><mergeCell ref="M2:N2"/><mergeCell ref="O2:P2"/><mergeCell ref="M3:N4"/><mergeCell ref="O3:P4"/>';
 mg+='<mergeCell ref="B6:C6"/><mergeCell ref="D6:E6"/><mergeCell ref="F6:G6"/><mergeCell ref="H6:I6"/><mergeCell ref="J6:K6"/><mergeCell ref="L6:M6"/><mergeCell ref="N6:O6"/>';
 mg+='<mergeCell ref="B7:C8"/><mergeCell ref="D7:E8"/><mergeCell ref="F7:G8"/><mergeCell ref="H7:I8"/><mergeCell ref="J7:K8"/><mergeCell ref="L7:M8"/><mergeCell ref="N7:O8"/><mergeCell ref="P7:P8"/>';
 GS.forEach(function(gs){mg+='<mergeCell ref="B'+gs+':F'+gs+'"/><mergeCell ref="G'+gs+':K'+gs+'"/><mergeCell ref="L'+gs+':P'+gs+'"/><mergeCell ref="B'+(gs+1)+':F'+(gs+7)+'"/><mergeCell ref="G'+(gs+1)+':K'+(gs+7)+'"/><mergeCell ref="L'+(gs+1)+':P'+(gs+7)+'"/>';});
-mg+='</mergeCells>';
+mg+='</mergeCells>';if(notesText){mg=mg.replace('</mergeCells>','<mergeCell ref="B51:P51"/><mergeCell ref="B52:P52"/></mergeCells>');}
 var hI=imgs.length>0;
-var wsXml=XD+'<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheetPr><tabColor rgb="FFFF0000"/><pageSetUpPr fitToPage="1"/></sheetPr><dimension ref="B1:Q49"/><sheetViews><sheetView showGridLines="0" view="pageBreakPreview" zoomScale="85" zoomScaleNormal="100" zoomScaleSheetLayoutView="85" workbookViewId="0"/></sheetViews><sheetFormatPr defaultColWidth="12.5" defaultRowHeight="23.25" customHeight="1"/>'+CL+sd+mg+(hI?'<drawing r:id="rId2"/>':'')+'</worksheet>';
+var wsXml=XD+'<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheetPr><tabColor rgb="FFFF0000"/><pageSetUpPr fitToPage="1"/></sheetPr><dimension ref="B1:Q52"/><sheetViews><sheetView showGridLines="0" view="pageBreakPreview" zoomScale="85" zoomScaleNormal="100" zoomScaleSheetLayoutView="85" workbookViewId="0"/></sheetViews><sheetFormatPr defaultColWidth="12.5" defaultRowHeight="23.25" customHeight="1"/>'+CL+sd+mg+(hI?'<drawing r:id="rId2"/>':'')+'</worksheet>';
 var sstXml=XD+'<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="'+ss.length+'" uniqueCount="'+ss.length+'">';
 ss.forEach(function(s){sstXml+='<si><t>'+s+'</t></si>';});sstXml+='</sst>';
 var zf={};
